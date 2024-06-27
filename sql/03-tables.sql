@@ -1,3 +1,5 @@
+\c main;
+
 create table users
 (
     id         serial

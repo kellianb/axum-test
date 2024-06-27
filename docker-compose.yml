@@ -3,7 +3,7 @@ version: "3.8"
 volumes:
   postgres-data: {}
   pgadmin-data: {}
-  elasticsearch: {}
+  elasticsearch-data: {}
 
 services:
   db:
@@ -16,6 +16,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
+      - ./sql/:/docker-entrypoint-initdb.d/
       - postgres-data:/var/lib/postgresql/data
     networks:
       - backendnetwork
@@ -50,7 +51,7 @@ services:
     networks:
       - backendnetwork
     volumes:
-      - elasticsearch:/usr/share/elasticsearch/data
+      - elasticsearch-data:/usr/share/elasticsearch/data
     ulimits:
       memlock:
         soft: -1
