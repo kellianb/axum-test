@@ -1,5 +1,7 @@
 use axum::Extension;
 use sqlx::{Pool, Postgres};
+mod handlers;
+mod models;
 mod routes;
 
 async fn get_db_pool() -> Pool<Postgres> {
