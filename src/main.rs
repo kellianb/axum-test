@@ -1,6 +1,9 @@
-use axum::Extension;
+use axum::{middleware, Extension};
+use elasticsearch::{http::transport::Transport, Elasticsearch};
 use sqlx::{Pool, Postgres};
+use std::sync::Arc;
 mod handlers;
+mod layers;
 mod models;
 mod routes;
 
@@ -17,9 +20,19 @@ async fn get_db_pool() -> Pool<Postgres> {
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().expect("Missing .env file!");
+
     let server_address = std::env::var("SERVER_ADDRESS").unwrap_or("127.0.0.1:3000".to_string());
 
-    let app = routes::get_router().layer(Extension(get_db_pool().await));
+    let elastic_transport =
+        Transport::single_node("http://localhost:9200").expect("Elasticsearch connection failed");
+    let elastic_client = Arc::new(Elasticsearch::new(elastic_transport));
+
+    let app = routes::get_router()
+        .layer(Extension(get_db_pool().await))
+        .layer(middleware::from_fn_with_state(
+            elastic_client,
+            layers::request_logging::log_request,
+        ));
 
     let listener = tokio::net::TcpListener::bind(server_address).await.unwrap();
 
