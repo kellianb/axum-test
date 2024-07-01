@@ -25,7 +25,7 @@ pub async fn log_request(
     request: Request,
     next: Next,
 ) -> Response {
-    // println!("{:?}", request);
+    //println!("{:?}", request);
 
     let headers = request.headers();
     let socket_ip = socket_address.ip();

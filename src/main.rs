@@ -31,7 +31,7 @@ async fn main() {
         .layer(Extension(get_db_pool().await))
         .layer(middleware::from_fn_with_state(
             elastic_client,
-            layers::request_logging::log_request,
+            layers::logging::log_request,
         ));
 
     let listener = tokio::net::TcpListener::bind(server_address).await.unwrap();
