@@ -21,7 +21,7 @@ async fn get_db_pool() -> Pool<Postgres> {
 async fn main() {
     dotenvy::dotenv().expect("Missing .env file!");
 
-    let server_address = std::env::var("SERVER_ADDRESS").unwrap_or("127.0.0.1:3000".to_string());
+    let server_address = std::env::var("LISTEN_ADDRESS").unwrap_or("127.0.0.1:3000".to_string());
 
     let elastic_transport =
         Transport::single_node("http://localhost:9200").expect("Elasticsearch connection failed");
@@ -38,5 +38,10 @@ async fn main() {
 
     println!("Listening on {}", listener.local_addr().unwrap());
 
-    axum::serve(listener, app).await.unwrap();
+    axum::serve(
+        listener,
+        app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+    )
+    .await
+    .unwrap();
 }

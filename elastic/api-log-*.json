@@ -26,6 +26,12 @@
           }
         }
       },
+      "socket_ip": {
+        "type": "ip"
+      },
+      "socket_port": {
+        "type": "long"
+      },
       "time": {
         "type": "date",
         "format": "epoch_millis"

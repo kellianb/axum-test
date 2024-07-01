@@ -6,6 +6,7 @@ use axum::{
     response::IntoResponse,
     Router,
 };
+use serde_json::json;
 
 pub fn get_routes() -> Router {
     axum::Router::new()
@@ -19,11 +20,12 @@ pub async fn get_all(Extension(pool): Extension<sqlx::Pool<sqlx::Postgres>>) -> 
     let response = user_handlers::get_all(&pool).await;
 
     match response {
-        Ok(val) => (StatusCode::OK, serde_json::to_string(&val).unwrap()),
+        Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
         Err(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            r#"{ "message" : "Error" }"#.to_string(),
-        ),
+            Json(json!({ "message" : "Error" })),
+        )
+            .into_response(),
     }
 }
 
@@ -34,11 +36,12 @@ pub async fn get(
     let response = user_handlers::get(id, &pool).await;
 
     match response {
-        Ok(val) => (StatusCode::OK, serde_json::to_string(&val).unwrap()),
+        Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
         Err(_) => (
             StatusCode::NOT_FOUND,
-            r#"{ "message" : "User not found" }"#.into(),
-        ),
+            Json(json!({ "message" : "User not found" })),
+        )
+            .into_response(),
     }
 }
 
@@ -49,11 +52,12 @@ pub async fn create(
     let response = user_handlers::create(user_data, &pool).await;
 
     match response {
-        Ok(val) => (StatusCode::OK, serde_json::to_string(&val).unwrap()),
+        Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
         Err(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            r#"{ "message" : "Error" }"#.to_string(),
-        ),
+            Json(json!({ "message" : "Internal server error" })),
+        )
+            .into_response(),
     }
 }
 
@@ -64,11 +68,18 @@ pub async fn delete(
     let response = user_handlers::delete(id, &pool).await;
 
     match response {
-        Ok(val) if val > 0 => (StatusCode::OK, r#"{ "message" : "User deleted"}"#),
-        Ok(_) => (StatusCode::NOT_FOUND, r#"{ "message" : "User not found" }"#),
+        Ok(val) if val > 0 => {
+            (StatusCode::OK, Json(json!({ "message" : "User deleted"}))).into_response()
+        }
+        Ok(_) => (
+            StatusCode::NOT_FOUND,
+            Json(json!({ "message" : "User not found" })),
+        )
+            .into_response(),
         Err(_) => (
             StatusCode::INTERNAL_SERVER_ERROR,
-            r#"{ "message" : "Error" }"#,
-        ),
+            Json(json!({ "message" : "Internal server error" })),
+        )
+            .into_response(),
     }
 }
