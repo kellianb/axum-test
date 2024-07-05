@@ -2,6 +2,7 @@ use axum::{middleware, Extension};
 use elasticsearch::{http::transport::Transport, Elasticsearch};
 use sqlx::{Pool, Postgres};
 use std::sync::Arc;
+mod error;
 mod handlers;
 mod layers;
 mod models;

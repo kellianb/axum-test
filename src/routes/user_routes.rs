@@ -1,3 +1,4 @@
+use crate::error::Error;
 use crate::handlers::user_handlers;
 use crate::models::user_models::*;
 use axum::{
@@ -21,11 +22,7 @@ pub async fn get_all(Extension(pool): Extension<sqlx::Pool<sqlx::Postgres>>) -> 
 
     match response {
         Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
-        Err(_) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({ "message" : "Error" })),
-        )
-            .into_response(),
+        Err(_) => Error::InternalServerError.into_response(),
     }
 }
 
@@ -37,11 +34,8 @@ pub async fn get(
 
     match response {
         Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
-        Err(_) => (
-            StatusCode::NOT_FOUND,
-            Json(json!({ "message" : "User not found" })),
-        )
-            .into_response(),
+        Err(sqlx::Error::RowNotFound) => Error::UserNotFound.into_response(),
+        Err(_) => Error::InternalServerError.into_response(),
     }
 }
 
@@ -53,11 +47,7 @@ pub async fn create(
 
     match response {
         Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
-        Err(_) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({ "message" : "Internal server error" })),
-        )
-            .into_response(),
+        Err(_) => Error::InternalServerError.into_response(),
     }
 }
 
@@ -71,15 +61,7 @@ pub async fn delete(
         Ok(val) if val > 0 => {
             (StatusCode::OK, Json(json!({ "message" : "User deleted"}))).into_response()
         }
-        Ok(_) => (
-            StatusCode::NOT_FOUND,
-            Json(json!({ "message" : "User not found" })),
-        )
-            .into_response(),
-        Err(_) => (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({ "message" : "Internal server error" })),
-        )
-            .into_response(),
+        Ok(_) => Error::UserNotFound.into_response(),
+        Err(_) => Error::InternalServerError.into_response(),
     }
 }
