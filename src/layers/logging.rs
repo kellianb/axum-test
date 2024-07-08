@@ -1,15 +1,14 @@
 use chrono::prelude::*;
-use std::sync::Arc;
 
 use axum::{
-    extract::{connect_info::ConnectInfo, Request, State},
+    extract::{connect_info::ConnectInfo, Extension, Request},
     http::header::{HOST, USER_AGENT},
     middleware::Next,
     response::Response,
 };
 use elasticsearch::{Elasticsearch, IndexParts};
 use serde::{Deserialize, Serialize};
-use serde_json::json;
+use serde_json::{json, Value};
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Log {
@@ -20,18 +19,16 @@ struct Log {
 }
 
 pub async fn log_request(
-    State(client): State<Arc<Elasticsearch>>,
     ConnectInfo(socket_address): ConnectInfo<std::net::SocketAddr>,
+    Extension(client): Extension<Elasticsearch>,
     request: Request,
     next: Next,
 ) -> Response {
-    //println!("{:?}", request);
-
     let headers = request.headers();
     let socket_ip = socket_address.ip();
     let socket_port = socket_address.port();
 
-    let log = json!( {
+    let mut log = json!( {
         "method": format!("{:?}", request.method()),
         "uri": request.uri().to_string(),
         "user_agent": headers[USER_AGENT].to_str().unwrap_or(""),
@@ -41,20 +38,27 @@ pub async fn log_request(
         "time": Utc::now().timestamp_millis(),
     });
 
-    let index = format! {"api-log-{}", Utc::now().format("%Y-%m")};
+    // Execute request
+    let response = next.run(request).await;
 
-    let response = client
-        .index(IndexParts::Index(&index))
+    // Log status code
+    log.as_object_mut()
+        .unwrap()
+        .insert("status_code".to_string(), json!(response.status().as_u16()));
+
+    let elastic_index = format! {"api-log-{}", Utc::now().format("%Y-%m")};
+
+    let log_response = client
+        .index(IndexParts::Index(&elastic_index))
         .body(log)
         .send()
         .await;
 
-    if let Err(val) = response {
+    if let Err(val) = log_response {
         println!("Logging error!");
         println!("{:?}", val);
     }
 
-    //println!("{:?}", response);
-
-    next.run(request).await
+    // Return response
+    response
 }
