@@ -8,7 +8,7 @@ use axum::{
 };
 use elasticsearch::{Elasticsearch, IndexParts};
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::json;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Log {

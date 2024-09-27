@@ -1,0 +1,24 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO messages (id, sent_at, content, sender_id, deleted)\n        VALUES (DEFAULT, $1, $2, $3, DEFAULT)\n        RETURNING id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Timestamp",
+        "Varchar",
+        "Int4"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "6448c2806ebc3d19b07aa4afb9917d2f7c782b4d131c20ec29195af221f2375e"
+}

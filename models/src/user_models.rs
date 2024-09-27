@@ -13,7 +13,7 @@ pub struct User {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateUser {
     pub username: String,
-    pub role: String,
+    pub role_id: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug, FromRow)]

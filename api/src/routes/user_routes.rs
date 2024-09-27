@@ -1,12 +1,12 @@
 use crate::error::AppError;
 use crate::handlers::user_handlers;
-use crate::models::user_models::*;
 use axum::{
     extract::{Extension, Json, Path},
     http::StatusCode,
     response::IntoResponse,
     Router,
 };
+use models::user_models::*;
 use serde_json::json;
 
 pub fn get_routes() -> Router {
@@ -47,6 +47,7 @@ pub async fn create(
 
     match response {
         Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
+        Err(sqlx::Error::Database(_)) => AppError::InvalidUserRole.into_response(),
         Err(_) => AppError::InternalServerError.into_response(),
     }
 }

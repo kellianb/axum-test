@@ -4,7 +4,6 @@ use sqlx::{Pool, Postgres};
 mod error;
 mod handlers;
 mod layers;
-mod models;
 mod routes;
 
 async fn get_db_pool() -> Pool<Postgres> {
@@ -21,8 +20,6 @@ async fn get_db_pool() -> Pool<Postgres> {
 
 #[tokio::main]
 async fn main() {
-    dotenvy::dotenv().expect("Missing .env file!");
-
     // Get Environment
     let server_address = std::env::var("LISTEN_ADDRESS")
         .expect("An address for the server to listen on, example: 127.0.0.1:3000");

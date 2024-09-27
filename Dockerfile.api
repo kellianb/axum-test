@@ -1,0 +1,37 @@
+# -----------------
+# Cargo Build Stage
+# -----------------
+
+FROM rust as cargo-build
+
+WORKDIR /usr/src/app
+COPY models models
+
+WORKDIR /usr/src/app/api
+COPY ./api/Cargo.lock .
+COPY ./api/Cargo.toml .
+RUN mkdir .cargo
+RUN cargo vendor > .cargo/config.toml
+
+# Cache compiled dependencies
+RUN sed -i 's#src/main.rs#dummy.rs#' Cargo.toml
+RUN echo "fn main() {}" > dummy.rs
+RUN cargo build
+RUN rm dummy.rs
+RUN sed -i 's#dummy.rs#src/main.rs#' Cargo.toml
+
+# Copy actual source code and build it
+COPY ./api/.sqlx .sqlx
+COPY ./api/src src
+RUN cargo install --path . --verbose
+
+# -----------------
+# Final Stage
+# -----------------
+
+FROM debian:stable-slim
+RUN apt-get update && apt-get install -y libssl3 ca-certificates && rm -rf /var/lib/apt/lists/*
+
+COPY --from=cargo-build /usr/local/cargo/bin/api /bin
+
+CMD ["api"]
