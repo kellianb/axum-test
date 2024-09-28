@@ -8,6 +8,7 @@ name = "ChatApp"
 # value: web | desktop
 default_platform = "web"
 
+asset_dir = "assets"
 [web.app]
 
 # HTML title tag content
@@ -18,10 +19,19 @@ title = "Chat app"
 [web.resource]
 
 # CSS style file
-style = ["reset.css"]
+style = ["style.css"]
 
 [web.resource.dev]
 
 # Javascript code file
 # serve: [dev-server] only
 script = []
+
+
+[web.watcher]
+
+# when watcher trigger, regenerate the `index.html`
+reload_html = true
+
+# which files or dirs will be watcher monitoring
+watch_path = ["src", "assets"]

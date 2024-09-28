@@ -1,15 +1,18 @@
 use dioxus::prelude::*;
+mod message;
+mod message_list;
 mod navbar;
 
 fn main() {
-    launch(App);
+    launch(app);
 }
 
-pub fn App() -> Element {
+pub fn app() -> Element {
     rsx! {
         div {
             navbar::Navbar {}
         }
+
         "story"
     }
 }

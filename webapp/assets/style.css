@@ -133,3 +133,10 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+/*CSS reset end*/
+
+body {
+  width: 100vw;
+  font-family: Inter, sans-serif;
+}

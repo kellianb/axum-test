@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 #[component]
-pub fn Navbar() -> Element {
+pub fn message_list() -> Element {
     rsx! {
         nav {
             style: "
