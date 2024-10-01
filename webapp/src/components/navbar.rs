@@ -5,19 +5,22 @@ pub fn Navbar() -> Element {
     rsx! {
         nav {
             style: "
-            padding: 0.7rem 1rem 0.7rem 2rem;
-            margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+            padding: 1rem 0rem 1rem 0rem;
+            margin: 0.5rem 2rem 0.5rem 2rem;
             border-radius: 0.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             ",
-            p
+            a
             {
                 style: "
                 font-size: 1.5rem;
                 font-weight: 600;
+                text-decoration: none;
+                color: black;
                 ",
+                href: "/",
                 "ChatApp"
             }
             ul {
@@ -25,7 +28,14 @@ pub fn Navbar() -> Element {
                 font-weight: 500;
                 ",
                 li {
-                "Login"
+                    a {
+                        style: "
+                        text-decoration: none;
+                        color: black;
+                        ",
+                        href: "/login",
+                        "Login"
+                    }
                 }
             }
         }

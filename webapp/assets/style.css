@@ -138,5 +138,10 @@ table {
 
 body {
   width: 100vw;
-  font-family: Inter, sans-serif;
+  font-family: "Inter", sans-serif;
+}
+
+main {
+  margin: 0rem 2rem 0rem 2rem;
+  padding: 2rem 0rem 0rem 0rem;
 }
