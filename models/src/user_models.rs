@@ -1,8 +1,8 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 
-#[derive(Serialize, Deserialize, Debug, FromRow)]
+#[derive(Serialize, Deserialize, Debug)]
+#[cfg_attr(feature = "sqlx", derive(sqlx::FromRow))]
 pub struct User {
     pub id: i32,
     pub username: String,
@@ -16,7 +16,8 @@ pub struct CreateUser {
     pub role_id: i32,
 }
 
-#[derive(Serialize, Deserialize, Debug, FromRow)]
+#[derive(Serialize, Deserialize, Debug)]
+#[cfg_attr(feature = "sqlx", derive(sqlx::FromRow))]
 pub struct NewUser {
     pub id: i32,
 }

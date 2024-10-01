@@ -1,9 +1,9 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use sqlx::FromRow;
 
 // Used to show a message to a user
-#[derive(Serialize, Deserialize, Debug, FromRow, PartialEq, Eq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
+#[cfg_attr(feature = "sqlx", derive(sqlx::FromRow))]
 pub struct Message {
     pub id: i32,
     pub sent_at: NaiveDateTime,
