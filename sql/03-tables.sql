@@ -13,6 +13,7 @@ CREATE TABLE "users"
 (
     "id"         serial PRIMARY KEY,
     "username"   varchar(255) not null,
+    "password_hash" varchar(128) not null,
     "role_id"    int not null,
     "created_at" timestamp not null,
     "deleted"   bool not null default FALSE

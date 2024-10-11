@@ -47,8 +47,18 @@ pub async fn create(
 
     match response {
         Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
-        Err(sqlx::Error::Database(_)) => AppError::InvalidUserRole.into_response(),
-        Err(_) => AppError::InternalServerError.into_response(),
+        Err(e) => match e {
+            user_handlers::Error::DatabaseError(e) => match e {
+                sqlx::Error::Database(_) => AppError::InvalidUserRole.into_response(),
+                _ => AppError::InternalServerError.into_response(),
+            },
+            user_handlers::Error::Argon2Error(e) => match e {
+                argon2::password_hash::Error::Password => {
+                    AppError::InvalidUserPassword.into_response()
+                }
+                _ => AppError::InternalServerError.into_response(),
+            },
+        },
     }
 }
 

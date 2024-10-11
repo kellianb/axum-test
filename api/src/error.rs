@@ -9,8 +9,9 @@ pub enum AppError {
     InternalServerError, // Catch all for unknown errors
 
     // User Errors
-    UserNotFound,    // There is no user with the specified ID
-    InvalidUserRole, // The given role does not exist
+    UserNotFound,        // There is no user with the specified ID
+    InvalidUserRole,     // The given role does not exist
+    InvalidUserPassword, // Invalid password given to create user
 
     // Message errors
     MessageNotFound, // The is no message with the specified ID
@@ -29,7 +30,11 @@ impl IntoResponse for AppError {
             ),
             Self::InvalidUserRole => (
                 StatusCode::UNPROCESSABLE_ENTITY,
-                Json(json!({ "message" : "The given role_id does not correspond to any existing role" })),
+                Json(json!({ "message" : "The given role_id does not correspond to any existing role, or other backend error" })),
+            ),
+            Self::InvalidUserPassword => (
+                StatusCode::UNPROCESSABLE_ENTITY,
+                Json(json!({ "message" : "Invalid password given to create user"}))
             ),
             Self::MessageNotFound => (
                 StatusCode::NOT_FOUND,

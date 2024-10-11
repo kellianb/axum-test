@@ -6,7 +6,9 @@ VALUES ('admin'),
        ('user');
 
 
+/*
 INSERT INTO users (username, role_id, created_at) VALUES
+
 ('alice', 1, '2024-01-01 10:00:00'),
 ('bob', 3, '2024-01-02 11:00:00'),
 ('charlie', 3, '2024-01-03 12:00:00'),
@@ -17,3 +19,4 @@ INSERT INTO users (username, role_id, created_at) VALUES
 ('heidi', 3, '2024-01-08 17:00:00'),
 ('ivan', 1, '2024-01-09 18:00:00'),
 ('judy', 3, '2024-01-10 19:00:00');
+*/

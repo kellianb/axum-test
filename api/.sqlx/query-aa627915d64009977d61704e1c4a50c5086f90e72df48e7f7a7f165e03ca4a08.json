@@ -1,6 +1,6 @@
 {
   "db_name": "PostgreSQL",
-  "query": "INSERT INTO users (id, username, role_id, created_at, deleted) \n        VALUES (DEFAULT, $1, $2, $3, DEFAULT)\n        RETURNING id",
+  "query": "INSERT INTO users (id, username, password_hash, role_id, created_at, deleted)\n        VALUES (DEFAULT, $1, $2, $3, $4, DEFAULT)\n        RETURNING id",
   "describe": {
     "columns": [
       {
@@ -12,6 +12,7 @@
     "parameters": {
       "Left": [
         "Varchar",
+        "Varchar",
         "Int4",
         "Timestamp"
       ]
@@ -20,5 +21,5 @@
       false
     ]
   },
-  "hash": "553659ee1831f0dc75b18e958a265be086105b9c984c624fb2f0125f86b6d185"
+  "hash": "aa627915d64009977d61704e1c4a50c5086f90e72df48e7f7a7f165e03ca4a08"
 }

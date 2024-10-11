@@ -10,9 +10,10 @@ pub struct User {
     pub created_at: NaiveDateTime,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CreateUser {
     pub username: String,
+    pub password: String,
     pub role_id: i32,
 }
 
