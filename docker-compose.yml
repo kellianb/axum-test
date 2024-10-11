@@ -35,12 +35,12 @@ services:
 
   elasticsearch:
     container_name: elasticsearch
-    image: elasticsearch:8.7.1
+    image: elasticsearch:8.15.2
     # 8.x
     environment:
       [
-        "CLI_JAVA_OPTS=-Xms2g -Xmx2g",
-        "bootstrap.memory_lock=true",
+        "CLI_JAVA_OPTS=-Xms4g -Xmx4g",
+        # "bootstrap.memory_lock=true",
         "discovery.type=single-node",
         "xpack.security.enabled=false",
         "xpack.security.enrollment.enabled=false",
@@ -66,7 +66,7 @@ services:
           cpus: "1.0"
 
   kibana:
-    image: kibana:8.7.1
+    image: kibana:8.15.2
     container_name: kibana
     environment:
       XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY: d1a66dfd-c4d3-4a0a-8290-2abcb83ab3aa
@@ -80,7 +80,8 @@ services:
           cpus: "2.0"
         reservations:
           cpus: "1.0"
-
+    depends_on:
+      - elasticsearch
 
   api:
     container_name: api
@@ -97,6 +98,18 @@ services:
       - backendnetwork
     depends_on:
           - db
+
+  webapp:
+    container_name: webapp
+    build:
+      context: .
+      dockerfile: ./Dockerfile.webapp
+    ports:
+      - 8080:80
+    networks:
+      - backendnetwork
+    depends_on:
+          - api
 
 networks:
   backendnetwork:

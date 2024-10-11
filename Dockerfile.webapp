@@ -1,0 +1,49 @@
+# -----------------
+# Cargo Build Stage
+# -----------------
+
+FROM rust AS cargo-build
+LABEL authors="kellian"
+
+RUN rustup target add wasm32-unknown-unknown
+RUN cargo install dioxus-cli
+
+WORKDIR /usr/src/app
+COPY models models
+
+WORKDIR /usr/src/app/webapp
+COPY ./webapp/Cargo.toml Cargo.toml
+RUN mkdir .cargo
+RUN cargo vendor > .cargo/config.toml
+
+# Build dependencies, target wasm32-unknown-unknown
+RUN sed -i 's#src/main.rs#dummy.rs#' Cargo.toml
+RUN echo "fn main() {}" > dummy.rs
+RUN cargo build --target wasm32-unknown-unknown
+RUN rm dummy.rs
+RUN sed -i 's#dummy.rs#src/main.rs#' Cargo.toml
+
+# Copy actual code
+COPY ./webapp/assets ./assets
+COPY ./webapp/Dioxus.toml Dioxus.toml
+COPY ./webapp/index.html ./index.html
+COPY ./webapp/src ./src
+
+# Build the app
+RUN dx build --release
+
+# Use a minimal base image for serving the app
+FROM nginx:alpine
+
+# Remove default Nginx config
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy custom Nginx config
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# Copy the built assets from the builder stage
+COPY --from=cargo-build /usr/src/app/webapp/dist /usr/share/nginx/html
+
+# Start Nginx server
+CMD ["nginx", "-g", "daemon off;"]
+

@@ -3,6 +3,7 @@
 # -----------------
 
 FROM rust AS cargo-build
+LABEL authors="kellian"
 
 WORKDIR /usr/src/app
 COPY models models
