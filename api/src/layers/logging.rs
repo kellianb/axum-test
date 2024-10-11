@@ -46,7 +46,7 @@ pub async fn log_request(
         .unwrap()
         .insert("status_code".to_string(), json!(response.status().as_u16()));
 
-    let elastic_index = format! {"api-log-{}", Utc::now().format("%Y-%m")};
+    let elastic_index = format! {"api-request-log-{}", Utc::now().format("%Y-%m")};
 
     let log_response = client
         .index(IndexParts::Index(&elastic_index))

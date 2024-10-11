@@ -1,6 +1,6 @@
 {
   "index_patterns": [
-    "api-log-*"
+    "api-request-log-*"
   ],
   "settings": {
     "number_of_shards": 1,
