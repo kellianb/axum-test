@@ -66,6 +66,7 @@ dependencies = [
  "chrono",
  "elasticsearch",
  "models",
+ "rand",
  "reqwest 0.12.7",
  "serde",
  "serde_json",

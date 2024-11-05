@@ -25,8 +25,8 @@ pub async fn get(id: i32, pool: &Pool<Postgres>) -> Result<Message, Error> {
 }
 
 pub async fn create(
-    message_data: SendMessage,
-    sender_id: i32,
+    message_data: &SendMessage,
+    sender_id: &i32,
     pool: &Pool<Postgres>,
 ) -> Result<NewMessage, Error> {
     query_as!(

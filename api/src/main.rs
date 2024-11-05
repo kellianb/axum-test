@@ -1,5 +1,6 @@
 use axum::{middleware, Extension};
 use elasticsearch::{http::transport::Transport, Elasticsearch};
+use models::login_models::LoginSession;
 use sqlx::{Pool, Postgres};
 use tower_http::cors::{Any, CorsLayer};
 mod error;
@@ -8,9 +9,8 @@ mod layers;
 mod routes;
 
 async fn get_db_pool() -> Pool<Postgres> {
-    let database_url = std::env::var("DATABASE_URL").expect(
-        "Missing Database URL, example: postgresql://username:password@localhost:5432/main",
-    );
+    let database_url = std::env::var("DATABASE_URL")
+        .expect("Database URL, example: postgresql://username:password@localhost:5432/main");
 
     sqlx::postgres::PgPoolOptions::new()
         .max_connections(16)
@@ -35,7 +35,7 @@ async fn main() {
 
     let elastic = Elasticsearch::new(elastic_transport);
 
-    // ---- CORS ---
+    // ---- CORS ----
     let cors = CorsLayer::new()
         .allow_origin(Any) // Allow any origin
         .allow_methods(Any) // Allow any HTTP method
@@ -44,6 +44,9 @@ async fn main() {
     // ---- App ----
     // Build app stack
     let app = routes::get_router()
+        .layer(middleware::from_fn(
+            layers::authentication::authenticate_request,
+        ))
         .layer(middleware::from_fn(layers::logging::log_request))
         .layer(Extension(elastic))
         .layer(Extension(get_db_pool().await))

@@ -13,6 +13,9 @@ pub enum AppError {
     InvalidUserRole,     // The given role does not exist
     InvalidUserPassword, // Invalid password given to create user
 
+    // Login Errors
+    IncorrectCredentials, // The given login credentials are incorrect
+
     // Message errors
     MessageNotFound, // The is no message with the specified ID
 }
@@ -35,6 +38,10 @@ impl IntoResponse for AppError {
             Self::InvalidUserPassword => (
                 StatusCode::UNPROCESSABLE_ENTITY,
                 Json(json!({ "message" : "Invalid password given to create user"}))
+            ),
+            Self::IncorrectCredentials => (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({ "message" : "Incorrect login credentials"}))
             ),
             Self::MessageNotFound => (
                 StatusCode::NOT_FOUND,

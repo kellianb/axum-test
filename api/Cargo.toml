@@ -31,4 +31,5 @@ elasticsearch = { version = "8.5.0-alpha.1", default-features = false, features 
 models = { path = "../models", features = ["sqlx"] }
 tower = "0.5.1"
 tower-http = { version = "0.6.1", features = ["cors"] }
-argon2 = "0.5.3"
+argon2 = { version = "0.5.3", features = ["password-hash"] }
+rand = "0.8.5"

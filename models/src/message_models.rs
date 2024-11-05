@@ -12,11 +12,13 @@ pub struct Message {
 }
 
 // Used to send a message
+#[derive(Serialize, Deserialize, Debug)]
 pub struct SendMessage {
     pub content: String,
 }
 
 // Returns the ID assigned by the DB when sending a message
+#[derive(Serialize, Deserialize, Debug)]
 pub struct NewMessage {
     pub id: i32,
 }

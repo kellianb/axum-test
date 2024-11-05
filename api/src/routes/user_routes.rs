@@ -9,6 +9,11 @@ use axum::{
 use models::user_models::*;
 use serde_json::json;
 
+use argon2::{
+    password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
+    Argon2,
+};
+
 pub fn get_routes() -> Router {
     axum::Router::new()
         .route("/", axum::routing::get(get_all))
@@ -43,21 +48,30 @@ pub async fn create(
     Extension(pool): Extension<sqlx::Pool<sqlx::Postgres>>,
     Json(user_data): Json<CreateUser>,
 ) -> impl IntoResponse {
+    let salt = SaltString::generate(&mut OsRng);
+
+    let argon2 = Argon2::default();
+
+    let mut user_data = user_data;
+
+    // Hash password to PHC string ($argon2id$v=19$...)
+    if let Ok(password_hash) = argon2.hash_password(user_data.password.as_bytes(), &salt) {
+        user_data = CreateUser {
+            username: user_data.username,
+            password: password_hash.to_string(),
+            role_id: user_data.role_id,
+        };
+    } else {
+        return AppError::InvalidUserPassword.into_response();
+    }
+
     let response = user_handlers::create(user_data, &pool).await;
 
     match response {
         Ok(val) => (StatusCode::OK, Json(&val)).into_response(),
         Err(e) => match e {
-            user_handlers::Error::DatabaseError(e) => match e {
-                sqlx::Error::Database(_) => AppError::InvalidUserRole.into_response(),
-                _ => AppError::InternalServerError.into_response(),
-            },
-            user_handlers::Error::Argon2Error(e) => match e {
-                argon2::password_hash::Error::Password => {
-                    AppError::InvalidUserPassword.into_response()
-                }
-                _ => AppError::InternalServerError.into_response(),
-            },
+            sqlx::Error::Database(_) => AppError::InvalidUserRole.into_response(),
+            _ => AppError::InternalServerError.into_response(),
         },
     }
 }
