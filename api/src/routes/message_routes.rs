@@ -48,20 +48,24 @@ pub async fn create(
 
     match response {
         Ok(val) => (StatusCode::OK, Json(val)).into_response(),
-        Err(e) => match e {
-            sqlx::Error::Database(_) => AppError::InternalServerError.into_response(),
-            _ => AppError::InternalServerError.into_response(),
-        },
+        _ => AppError::InternalServerError.into_response(),
     }
 }
 
 pub async fn delete(
     Path(id): Path<i32>,
+    Extension(session): Extension<LoginSession>,
     Extension(pool): Extension<sqlx::Pool<sqlx::Postgres>>,
 ) -> impl IntoResponse {
-    let response = message_handlers::delete(id, &pool).await;
+    // Check if the current user is the sender
+    match message_handlers::get(id, &pool).await {
+        Ok(val) if val.sender_id == session.user_id => (),
+        Ok(_) => return AppError::PermissionDenied.into_response(),
+        Err(sqlx::Error::RowNotFound) => return AppError::MessageNotFound.into_response(),
+        Err(_) => return AppError::InternalServerError.into_response(),
+    };
 
-    match response {
+    match message_handlers::delete(id, &pool).await {
         Ok(val) if val > 0 => (
             StatusCode::OK,
             Json(json!({ "message" : "Message deleted"})),
