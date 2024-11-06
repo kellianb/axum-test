@@ -52,18 +52,17 @@ pub async fn create(
 
     let argon2 = Argon2::default();
 
-    let mut user_data = user_data;
-
     // Hash password to PHC string ($argon2id$v=19$...)
-    if let Ok(password_hash) = argon2.hash_password(user_data.password.as_bytes(), &salt) {
-        user_data = CreateUser {
-            username: user_data.username,
+    // Replace password in user_data with hashed version
+    let user_data = match argon2.hash_password(user_data.password.as_bytes(), &salt) {
+        Ok(password_hash) => CreateUser {
             password: password_hash.to_string(),
-            role_id: user_data.role_id,
-        };
-    } else {
-        return AppError::InvalidUserPassword.into_response();
-    }
+            ..user_data
+        },
+        Err(_) => {
+            return AppError::InvalidUserPassword.into_response();
+        }
+    };
 
     let response = user_handlers::create(user_data, &pool).await;
 
