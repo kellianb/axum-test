@@ -1,6 +1,5 @@
 use axum::{middleware, Extension};
 use elasticsearch::{http::transport::Transport, Elasticsearch};
-use models::login_models::LoginSession;
 use sqlx::{Pool, Postgres};
 use tower_http::cors::{Any, CorsLayer};
 mod error;
@@ -44,9 +43,6 @@ async fn main() {
     // ---- App ----
     // Build app stack
     let app = routes::get_router()
-        .layer(middleware::from_fn(
-            layers::authentication::authenticate_request,
-        ))
         .layer(middleware::from_fn(layers::logging::log_request))
         .layer(Extension(elastic))
         .layer(Extension(get_db_pool().await))
