@@ -62,10 +62,11 @@ pub async fn create(
         return AppError::InternalServerError.into_response();
     }
 
-    let session = if let Ok(data) = serde_json::to_string(&session) {
-        data
-    } else {
-        return AppError::InternalServerError.into_response();
+    let session = match serde_json::to_string(&session) {
+        Ok(data) => data,
+        Err(_) => {
+            return AppError::InternalServerError.into_response();
+        }
     };
 
     let mut headers = axum::http::HeaderMap::new();
