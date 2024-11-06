@@ -16,6 +16,12 @@ pub enum AppError {
     // Login Errors
     IncorrectCredentials, // The given login credentials are incorrect
 
+    // Permission Errors
+    PermissionDenied, // You do not have the permissions to do this
+
+    // Session Errors
+    InvalidSession, // This session is not valid
+
     // Message errors
     MessageNotFound, // The is no message with the specified ID
 }
@@ -42,6 +48,14 @@ impl IntoResponse for AppError {
             Self::IncorrectCredentials => (
                 StatusCode::UNAUTHORIZED,
                 Json(json!({ "message" : "Incorrect login credentials"}))
+            ),
+            Self::PermissionDenied => (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({ "message" : "You do not have the permissions to do this"}))
+            ),
+            Self::InvalidSession => (
+                StatusCode::UNAUTHORIZED,
+                Json(json!({ "message" : "This session is not valid"}))
             ),
             Self::MessageNotFound => (
                 StatusCode::NOT_FOUND,
