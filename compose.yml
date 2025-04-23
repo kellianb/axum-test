@@ -19,20 +19,6 @@ services:
     networks:
       - backendnetwork
 
-  pgadmin:
-    container_name: pgadmin4_container
-    image: dpage/pgadmin4
-    restart: no
-    environment:
-      PGADMIN_DEFAULT_EMAIL: kellian.bechtel@proton.me
-      PGADMIN_DEFAULT_PASSWORD: kellian
-    ports:
-      - 127.0.0.1:5050:80
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    networks:
-      - backendnetwork
-
   elasticsearch:
     container_name: elasticsearch
     image: elasticsearch:8.15.2
